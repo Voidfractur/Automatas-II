@@ -60,12 +60,13 @@ public class Semantico {
         }
         historiaPila.add(par);
     }
+    
     public void generarPila(){
         int numRenglon = 0;
         String temporal = "";
         boolean fprimerDiferente = false;
         boolean fprimerCodigo = true;
-        int tope = listaTokens.size();
+        int tope = listaTokens.size(); //numero de tokens
         tope = tope+5;
         for (int cont = 0; cont < tope; cont++) {
             String listaToken="";
@@ -79,23 +80,21 @@ public class Semantico {
         //for (String listaToken : listaTokens) {
              
            
-             if (esInicio()) {
-                 
-                 temporal =pila.pop();
-                 numRenglon++;
-                 listaSalida.add(generarRenglon(numRenglon, temporal));
-                 temporal =pila.pop();
-                 numRenglon++;
-                 listaSalida.add(generarRenglon(numRenglon, temporal));
-                 pila.push("INICIO");
-             
+             if (esInicio()) { //verifica si se aplica la regla de produccion inicio
+                 temporal =pila.pop(); // saca de pila el ultimo tk_{ y se guarda en temporal
+                 numRenglon++; //aumenta el contador de numero de renglon
+                 listaSalida.add(generarRenglon(numRenglon, temporal)); // Como salio de pila se agrega a lista
+                 temporal =pila.pop(); //saca de pila el ultimo tk_Begin y se guarda en temporal
+                 numRenglon++;//aumenta el contador de numero de renglon
+                 listaSalida.add(generarRenglon(numRenglon, temporal)); // Como salio de pila se agrega a lista
+                 pila.push("INICIO"); //se agrega a la pila
              verPila();
             }
-             if (esTipo()) {
-                temporal = pila.pop();
-                numRenglon++;
-                listaSalida.add(generarRenglon(numRenglon, temporal));
-                pila.push("TIPO");
+             if (esTipo()) {//verifica si se aplica la regla de produccion Tipo
+                temporal = pila.pop();// saca de pila el ultimo tk_intenger o tk_Real y se guarda en temporal
+                numRenglon++;//aumenta el contador de numero de renglon
+                listaSalida.add(generarRenglon(numRenglon, temporal));// Como salio de pila se agrega a lista
+                pila.push("TIPO");//se agrega a la pila
                 
                 verPila();
             }  
@@ -108,20 +107,20 @@ public class Semantico {
                 System.out.println("entro if3"+pila.peek());
             }
              */
-             if (esValor()) {
-               temporal = pila.pop();
-               numRenglon++;
-               listaSalida.add(generarRenglon(numRenglon, temporal));
-                pila.push("VALOR");
+             if (esValor()) {//verifica si se aplica la regla de produccion Valor
+               temporal = pila.pop();// saca de pila el ultimo tk_num y se guarda en temporal
+               numRenglon++;//aumenta el contador de numero de renglon
+               listaSalida.add(generarRenglon(numRenglon, temporal));// Como salio de pila se agrega a lista
+                pila.push("VALOR");//se agrega a la pila
                 
                 verPila();
             }
              
              for (int i = 0; i < 10; i++) {
                 
-               if (esParametro()) {
-                 if (fParametro) {
-               temporal = pila.pop();
+               if (esParametro()) {//verifica si se aplica la regla de produccion Valor
+                 if (fParametro) {//verifica que la bandera fparametro este apagada
+               temporal = pila.pop();// saca de pila el ultimo y se guarda en temporal
                numRenglon++;
                listaSalida.add(generarRenglon(numRenglon, temporal));
                      generarPadre("tk_)", numRenglon);
