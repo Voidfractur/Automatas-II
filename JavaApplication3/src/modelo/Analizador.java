@@ -275,8 +275,10 @@ for (String line : textoS) {
                   fErrorNumer = hayerrorNumero(number);     //verfica que el numero sea valido
                       System.out.println("numero "+number);
                   if (fErrorNumer==false) { //verfica que el numero sea valido
-                      listaSimbolos.get(listaSimbolos.size()-1).setValor(number);//añade el valor al simbolo
+                      if (!listaSimbolos.isEmpty()) {
+                          listaSimbolos.get(listaSimbolos.size()-1).setValor(number);//añade el valor al simbolo
                       
+                      }
                       //agregar el numero a la lista de tokens
                       cont++;
                       listaTokens.add("( "+number+" , tk_num"+" )");//lo añade a la lista de simbolos   
@@ -353,15 +355,15 @@ for (String line : textoS) {
           
           
           
-          if (fErrorNumer==true) {      //verifica bandera de error en numero
-          listaErrores.add("L"+linea+" Error en Numero");//añade el error a la lista de errores
-      }
+    
           if (hayErrorSimbolo(palabra.charAt(i))) {//verifica si es simbolo diferente a los permitidos
               ferrorSimbolo=true;                  //enciende la bandera de error
           }
           
       } 
-      
+            if (fErrorNumer==true) {      //verifica bandera de error en numero
+          listaErrores.add("L"+linea+" Error en Numero");//añade el error a la lista de errores
+      }
       if (fErrorPalabraReservada==true) {          //verifica bandera de error en palabra reservada
           listaErrores.add("L"+linea+" Error en palabra reservada");//añade el error a la lista de errores
       }
@@ -514,6 +516,7 @@ for (String line : textoS) {
       if(letra==';') return true;
       if(letra==',') return true;
       if(letra=='=') return true;
+      if(letra==' ') return true;
       return false;
   }
   public boolean perteneceSimbolo(char letra){

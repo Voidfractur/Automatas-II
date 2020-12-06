@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
  *
  * @author spart
  */
-public class Semantico {
+public class Sintactico {
     private  ArrayList<String> listaTokens;
     private Stack<String> pila;
     private ArrayList<String> historiaPila;
@@ -23,7 +23,7 @@ public class Semantico {
     private ArrayList<Renglon> listaSalida;
     private ArrayList<String> listaIdyNum;
     
-    public Semantico(ArrayList<String> listaTokens) {
+    public Sintactico(ArrayList<String> listaTokens) {
         listaIdyNum = new ArrayList<String>();
         this.listaTokens=acortarLista(listaTokens);
         pila= new Stack<String>();

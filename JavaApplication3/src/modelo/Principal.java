@@ -28,7 +28,7 @@ public class Principal extends javax.swing.JFrame {
      */
     private Analizador analizador;
     
-    private Semantico semantico;
+    private Sintactico semantico;
     private ArrayList<String> listaTokensAr;
     
     public Principal() {
@@ -239,7 +239,7 @@ public class Principal extends javax.swing.JFrame {
         }
         
         //Se crea el objeto y el constructor analiza la lista de tokens recibida
-        semantico = new Semantico(listaTokensAr);
+        semantico = new Sintactico(listaTokensAr);
       
         if (semantico.getPila().size()==1) {
             try {
