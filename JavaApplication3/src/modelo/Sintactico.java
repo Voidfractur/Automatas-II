@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 public class Sintactico {
     private  ArrayList<String> listaTokens;
     private Stack<String> pila;
+    private Stack<Integer>contadorPila;
+    private int contadorRenglon;
     private ArrayList<String> historiaPila;
     boolean fParametro;
     boolean fParametro2;
@@ -24,7 +26,9 @@ public class Sintactico {
     private ArrayList<String> listaIdyNum;
     
     public Sintactico(ArrayList<String> listaTokens) {
+        contadorPila = new Stack<>();
         listaIdyNum = new ArrayList<String>();
+        contadorRenglon=0;
         this.listaTokens=acortarLista(listaTokens);
         pila= new Stack<String>();
         fParametro = false;
@@ -64,6 +68,7 @@ public class Sintactico {
     public void generarPila(){
         int numRenglon = 0;
         String temporal = "";
+        String anterior = "";
         boolean fprimerDiferente = false;
         boolean fprimerCodigo = true;
         int tope = listaTokens.size(); //numero de tokens
@@ -73,9 +78,13 @@ public class Sintactico {
             if (cont<listaTokens.size()) {
                 listaToken = listaTokens.get(cont);
                 pila.push(listaToken);
+                contadorPila.push(contadorRenglon);
+                if (numRenglon>0) {
+                    aumentarRenglon(anterior);
+                }
                 verPila();
             }
-            
+           anterior=listaToken;
         //}
         //for (String listaToken : listaTokens) {
              
@@ -87,6 +96,9 @@ public class Sintactico {
                  temporal =pila.pop(); //saca de pila el ultimo tk_Begin y se guarda en temporal
                  numRenglon++;//aumenta el contador de numero de renglon
                  listaSalida.add(generarRenglon(numRenglon, temporal)); // Como salio de pila se agrega a lista
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.push(contadorRenglon);
                  pila.push("INICIO"); //se agrega a la pila
              verPila();
             }
@@ -94,6 +106,8 @@ public class Sintactico {
                 temporal = pila.pop();// saca de pila el ultimo tk_intenger o tk_Real y se guarda en temporal
                 numRenglon++;//aumenta el contador de numero de renglon
                 listaSalida.add(generarRenglon(numRenglon, temporal));// Como salio de pila se agrega a lista
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 pila.push("TIPO");//se agrega a la pila
                 
                 verPila();
@@ -112,7 +126,8 @@ public class Sintactico {
                numRenglon++;//aumenta el contador de numero de renglon
                listaSalida.add(generarRenglon(numRenglon, temporal));// Como salio de pila se agrega a lista
                 pila.push("VALOR");//se agrega a la pila
-                
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
              
@@ -133,6 +148,10 @@ public class Sintactico {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                      generarPadreTresOpciones("tk_id", "ASIG", "tk_num", numRenglon);
                 pila.push("PARAMETRO");
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
                  }else{
                      if (!fParametro2) {
@@ -153,6 +172,9 @@ public class Sintactico {
                              generarPadre("TIPOOPE", numRenglon);
                          }
                         pila.push("PARAMETRO");
+                        contadorPila.pop();
+                        contadorPila.pop();
+                        contadorPila.push(contadorRenglon);
                         verPila();
                        
                      }else{
@@ -175,6 +197,9 @@ public class Sintactico {
                        numRenglon++;
                        listaSalida.add(generarRenglon(numRenglon, temporal));
                        pila.push("PARAMETRO");
+                       contadorPila.pop();
+                       contadorPila.pop();
+                       contadorPila.push(contadorRenglon);
                        verPila();  
                        fParametro2=false;
                      }
@@ -196,7 +221,8 @@ public class Sintactico {
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("TIPOOPE");
-                
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
              if (esOperacion()) {
@@ -209,6 +235,9 @@ public class Sintactico {
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                  generarPadreCuatroOpciones("tk_ADD", "tk_MUL", "tk_DIV", "tk_SUB", numRenglon);
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.push(contadorRenglon);
                 pila.push("OPERACION");
                 
                 verPila();
@@ -242,7 +271,10 @@ public class Sintactico {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 generarPadre("tk_id", numRenglon);
                 pila.push("ASIG");
-                
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
              if (esIdasig()) {
@@ -256,7 +288,8 @@ public class Sintactico {
                      f2=false;
                  }
                 pila.push("IDASIG");
-                
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
              
@@ -266,6 +299,8 @@ public class Sintactico {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 
                 pila.push("FUNCION");
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 
                 verPila();
             }
@@ -283,7 +318,10 @@ public class Sintactico {
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                  generarPadreDosOpciones("tk_WRITE", "tk_READ", numRenglon);
                 pila.push("LW");
-                 
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.push(contadorRenglon);
                  verPila();
             }
              
@@ -311,7 +349,10 @@ public class Sintactico {
                      generarPadreDosOpciones("tk_id","ASIG", numRenglon);
                 
                 pila.push("LISTA");
-                
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
                  }else{
                 temporal = pila.pop();
@@ -323,6 +364,9 @@ public class Sintactico {
                      generarPadreDosOpciones("tk_id", "ASIG", numRenglon);
                 //generarPadre("tk_id", numRenglon);
                 pila.push("LISTA");
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 fprimerDiferente = true;
                  
                  verPila();
@@ -342,7 +386,9 @@ public class Sintactico {
                  listaSalida.add(generarRenglon(numRenglon, temporal));
                  generarPadreDosOpciones("tk_INTEGER", "tk_REAL", numRenglon);
                  pila.push("DECLARACION");
-                
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
              
@@ -365,7 +411,11 @@ public class Sintactico {
                     listaSalida.add(generarRenglon(numRenglon, temporal));
                     generarPadre("tk_id", numRenglon);
                     pila.push("IDOPE");
-                 
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.pop();
+                 contadorPila.push(contadorRenglon);
                 verPila();
                 /* }else{
                     pila.pop();
@@ -385,7 +435,9 @@ public class Sintactico {
                 numRenglon++;
                 listaSalida.add(generarRenglon(numRenglon, temporal));
                 pila.push("FIN");
-                
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
             for (int i = 0; i < 10; i++) {
@@ -411,6 +463,10 @@ public class Sintactico {
                         }
                         fParametro=false;
                         pila.push("CODIGO");
+                        contadorPila.pop();
+                        contadorPila.pop();
+                        contadorPila.push(contadorRenglon);
+                        
                     }else{
                         temporal = pila.pop();
                         numRenglon++;
@@ -432,6 +488,8 @@ public class Sintactico {
                             
                         }
                         pila.push("CODIGO");
+                        contadorPila.pop();
+                        contadorPila.push(contadorRenglon);
                         
                 }
                   verPila();  
@@ -455,6 +513,10 @@ public class Sintactico {
                  generarPadre("tk_{", numRenglon);
                  generarPadre("tk_BEGIN", numRenglon);
                 pila.push("PROGRAMA");
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.pop();
+                contadorPila.push(contadorRenglon);
                 verPila();
             }
         }
@@ -1118,8 +1180,34 @@ public int getPosicionLexema(String palabra){
     public ArrayList<Renglon> getListaSalida() {
         return listaSalida;
     }
-    
-    
-    
+    public void aumentarRenglon(String text){
+        if (text.equals("tk_{")) {
+            contadorRenglon++;
+        }
+         if (text.equals("tk_;")) {
+            contadorRenglon++;
+        }
+    }
+   public String buscarErrores(){
+        String res="";
+        int resto = 0;
+        int anterior = 0;
+        int tamanoPila = pila.size();
+        if (pila.size()>6) {
+           resto=1;
+       }
+       for (int i = 0; i < tamanoPila; i++) {
+           if (!pila.peek().equals("INICIO") && !pila.peek().equals("CODIGO") && !pila.peek().equals("FIN")) {
+               if (!(anterior==contadorPila.peek())) {
+                    res+="L"+(contadorPila.peek()-resto)+" Error de sintaxis\n";
+                    anterior=contadorPila.peek();
+               }
+           }
+           pila.pop();
+           System.out.println(contadorPila.pop());
+       }
+       System.out.println("errores"+res);
+       return res;
+   }
 }
 

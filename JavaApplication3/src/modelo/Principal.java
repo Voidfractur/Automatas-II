@@ -28,7 +28,7 @@ public class Principal extends javax.swing.JFrame {
      */
     private Analizador analizador;
     
-    private Sintactico semantico;
+    private Sintactico sintactico;
     private ArrayList<String> listaTokensAr;
     
     public Principal() {
@@ -239,13 +239,13 @@ public class Principal extends javax.swing.JFrame {
         }
         
         //Se crea el objeto y el constructor analiza la lista de tokens recibida
-        semantico = new Sintactico(listaTokensAr);
+        sintactico = new Sintactico(listaTokensAr);
       
-        if (semantico.getPila().size()==1) {
+        if (sintactico.getPila().size()==1) {
             try {
             lblError.setText("");
             String ruta = "C:/Users/spart/Desktop/Lexemas.txt";
-            String contenido = MostrarLista(semantico.getListaSalida());
+            String contenido = MostrarLista(sintactico.getListaSalida());
             File file = new File(ruta);
             // Si el archivo no existe es creado
             if (!file.exists()) {
@@ -261,6 +261,7 @@ public class Principal extends javax.swing.JFrame {
         }
         }else{
             lblError.setText("Error Archivo no creado");
+            cajaErrores.setText(cajaErrores.getText()+sintactico.buscarErrores());
             repaint();
         }
         
