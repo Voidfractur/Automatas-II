@@ -1204,9 +1204,9 @@ public int getPosicionLexema(String palabra){
                }
            }
            pila.pop();
-           System.out.println(contadorPila.pop());
+           //System.out.println(contadorPila.pop());
        }
-       System.out.println("errores"+res);
+       //System.out.println("errores"+res);
        return res;
    }
 }

@@ -8,7 +8,11 @@ package modelo;
 public class Simbolo {
    private String id;
    private String valor;
-
+   private String tipo;
+    public Simbolo() {
+        valor="";
+        tipo="";
+    }
     public String getId() {
         return id;
     }
@@ -27,7 +31,13 @@ public class Simbolo {
 
     @Override
     public String toString() {
-        return id + "    " + valor;
+        return id + "    " + tipo+ "    " + valor;
     }
-    
+
+    public String getTipo() {
+        return tipo;
+    }
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
 }

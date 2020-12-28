@@ -29,8 +29,9 @@ public class Principal extends javax.swing.JFrame {
     private Analizador analizador;
     
     private Sintactico sintactico;
+    private Semantico semantico;
     private ArrayList<String> listaTokensAr;
-    
+    private ArrayList<String> lista;
     public Principal() {
         initComponents();
         
@@ -265,6 +266,40 @@ public class Principal extends javax.swing.JFrame {
             repaint();
         }
         
+        // ****************************** SEMANTICO ******************************
+        semantico = new Semantico(sintactico.getListaSalida(), analizador.getListaSimbolos());
+         try {
+            semantico.setLista(leerArchivo("C:/Users/spart/Desktop/Lexemas.txt"));
+        } catch (IOException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        semantico.BuscarDeclaracion();
+        CajaIdentificadores.setText(MostrarLista(semantico.getListaSimbolos()));
+        //Se crea el objeto y el constructor analiza la lista de tokens recibida
+      
+        if (semantico.getListaErrores().size()<1) {
+            try {
+            lblError.setText("");
+            String ruta = "C:/Users/spart/Desktop/NodosDecorados.txt";
+            String contenido = MostrarLista(semantico.getNodosSintacticos());
+            File file = new File(ruta);
+            // Si el archivo no existe es creado
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(contenido);
+            bw.close();
+            //System.out.println("creado con exito");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        }else{
+            lblError.setText("Error Archivo no creado");
+            cajaErrores.setText(cajaErrores.getText()+MostrarLista(semantico.getListaErrores()));
+            repaint();
+        }
     }//GEN-LAST:event_btnAnalizarActionPerformed
  public static String muestraContenido(String archivo) throws FileNotFoundException, IOException {
         String cadena;

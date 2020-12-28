@@ -5,6 +5,8 @@
         <group>
             <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Renglon.java</file>
             <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Principal.java</file>
+            <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Simbolo.java</file>
+            <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Semantico.java</file>
             <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Sintactico.java</file>
             <file>file:/C:/Users/spart/Documents/GitHub/Automatas-II/JavaApplication3/src/modelo/Analizador.java</file>
         </group>

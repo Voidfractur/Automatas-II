@@ -5,6 +5,8 @@
  */
 package modelo;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author spart
@@ -13,6 +15,7 @@ public class Renglon {
     
     private int numero;
     private String Lexema;
+    private ArrayList<String> decoracion;
     private int padre;
     private boolean fpadre;
     private boolean fid;
@@ -22,6 +25,7 @@ public class Renglon {
         this.Lexema = Lexema;
         fpadre=false;
         fid=false;
+        decoracion = new ArrayList<>();
     }
 
     public boolean isFid() {
@@ -64,12 +68,29 @@ public class Renglon {
         this.fpadre = fpadre;
     }
 
-    @Override
-    public String toString() {
-        return numero+" "+Lexema+" "+padre; //To change body of generated methods, choose Tools | Templates.
+    public ArrayList<String> getDecoracion() {
+        return decoracion;
     }
 
+    public void setDecoracion(ArrayList<String> decoracion) {
+        this.decoracion = decoracion;
+    }
     
+
+    @Override
+    public String toString() {
+        return numero+" "+Lexema+" "+mostrarLista(decoracion)+padre; //To change body of generated methods, choose Tools | Templates.
+    }
+
+     public String mostrarLista(ArrayList lista){
+      String a="";
+      if (!lista.isEmpty()) {
+          for (int i = 0; i < lista.size(); i++) {
+              a+=lista.get(i).toString()+" ";
+          }
+      }
+      return a;
+  }
     
     
     
