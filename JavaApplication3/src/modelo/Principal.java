@@ -267,6 +267,9 @@ public class Principal extends javax.swing.JFrame {
         }
         
         // ****************************** SEMANTICO ******************************
+        if (sintactico.getPila().size()==1) {
+            
+        
         semantico = new Semantico(sintactico.getListaSalida(), analizador.getListaSimbolos());
          try {
             semantico.setLista(leerArchivo("C:/Users/spart/Desktop/Lexemas.txt"));
@@ -300,6 +303,7 @@ public class Principal extends javax.swing.JFrame {
             cajaErrores.setText(cajaErrores.getText()+MostrarLista(semantico.getListaErrores()));
             repaint();
         }
+    }
     }//GEN-LAST:event_btnAnalizarActionPerformed
  public static String muestraContenido(String archivo) throws FileNotFoundException, IOException {
         String cadena;

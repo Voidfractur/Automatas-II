@@ -14,11 +14,13 @@ public class Semantico {
     private String tipo;
     private ArrayList<String> listaErrores;
     private ArrayList<String> lista;
+    private int contadorDeRenglones;
     public Semantico(ArrayList<Renglon> nodosSintacticos, ArrayList<Simbolo> listaSimbolos) {
         this.nodosSintacticos = nodosSintacticos;
         this.listaSimbolos = listaSimbolos;
         listaHijos = new ArrayList<>();
         listaErrores = new ArrayList<>();
+        contadorDeRenglones = 0;
     }
 
     public ArrayList<Renglon> getNodosSintacticos() {
@@ -39,6 +41,9 @@ public class Semantico {
     
     public void BuscarDeclaracion(){
         for (Renglon nodosSintactico : nodosSintacticos) {
+            if (nodosSintactico.getLexema().equals("tk_BEGIN") || nodosSintactico.getLexema().equals("DECLARACION") || nodosSintactico.getLexema().equals("LW") || nodosSintactico.getLexema().equals("IDOPE")) {
+                contadorDeRenglones++;
+            }
             if (isDeclaracion(nodosSintactico.getLexema())) {
                 if (isInteger(getTipoDeclaracion(nodosSintactico).getLexema())) {
                     tipo="INTEGER";
@@ -50,9 +55,40 @@ public class Semantico {
                     }
                 }
             }
+            if (isIDOPE(nodosSintactico.getLexema())) {
+                contadorDeRenglones--;
+                decorarIDOPE(nodosSintactico);
+                contadorDeRenglones++;
+            }
+            
         }
     }
-    
+    public void decorarIDOPE(Renglon renglon){
+        String tipoIDOPE = "";
+        for (int i = renglon.getNumero(); i >1; i--) {
+            if (renglon.getNumero()==nodosSintacticos.get(i).getPadre()) {
+                if (nodosSintacticos.get(i).getLexema().equals("IDASIG")) {
+                    for (Renglon nodosSintactico1 : nodosSintacticos) {
+                        if (nodosSintactico1.getPadre()==nodosSintacticos.get(i).getNumero()) {
+                            if (tieneTipo(buscarSimbolo(getInParentesis(nodosSintactico1.getLexema())))) {
+                                
+                                tipoIDOPE=buscarSimbolo(getInParentesis(nodosSintactico1.getLexema())).getTipo();
+                                nodosSintacticos.get(i).getDecoracion().add(tipoIDOPE);
+                                nodosSintacticos.get(i).getDecoracion().add(getInParentesis(nodosSintactico1.getLexema()));
+                            }else{
+                                listaErrores.add("L "+contadorDeRenglones+" Error variable no declarada "+nodosSintactico1.getLexema());
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (nodosSintacticos.get(i).getLexema().equals("OPERACION")) {
+                    decorarOperacion(buscarHijosOperacion(nodosSintacticos.get(i)), tipoIDOPE);
+                    nodosSintacticos.get(i).getDecoracion().add(tipoIDOPE);
+                }
+            }
+        }
+    }
     public void decorarHijosLista(ArrayList<Integer> listaHijos){
         for (Integer listaHijo : listaHijos) {
             
@@ -76,7 +112,7 @@ public class Semantico {
                     nodosSintacticos.get(i).getDecoracion().add(tipo); //decora el idasig añadiendo el tipo
                     nodosSintacticos.get(i).getDecoracion().add(getInParentesis(nodosSintactico.getLexema())); // decora el idaig añadiendo la variable
                 }else{
-                     listaErrores.add("Error Semantico doble declaracion"+" "+nodosSintactico.getLexema()); //como ya tiene un tipo añade el error a la lista de errores
+                     listaErrores.add("L "+contadorDeRenglones+" Error Semantico doble declaracion"+" "+nodosSintactico.getLexema()); //como ya tiene un tipo añade el error a la lista de errores
                 }        
                                     break;
                                 }
@@ -113,11 +149,11 @@ public class Semantico {
                 nodosSintactico.getDecoracion().add(tipo);
                 nodosSintactico.getDecoracion().add(getInParentesis(nodosSintactico.getLexema()));
                 if (tipo.equals("INTEGER") && !esEntero(nodosSintactico.getLexema())) {
-                    listaErrores.add("Error Semantico en Lexema Sistemas numericos diferentes"+nodosSintactico.getNumero()+" "+nodosSintactico.getLexema());
+                    listaErrores.add("L "+contadorDeRenglones+" Error Semantico en Lexema Sistemas numericos diferentes "+nodosSintactico.getLexema());
                 }
                 
                 if (tipo.equals("REAL") && esEntero(nodosSintactico.getLexema())) {
-                    listaErrores.add("Error Semantico en Lexema Sistemas numericos diferentes"+nodosSintactico.getNumero()+" "+nodosSintactico.getLexema());
+                    listaErrores.add("L "+contadorDeRenglones+" Error Semantico en Lexema Sistemas numericos diferentes "+nodosSintactico.getLexema());
                 }
                 renglon.getDecoracion().add(tipo);
                 renglon.getDecoracion().add(getInParentesis(nodosSintactico.getLexema()));
@@ -135,7 +171,7 @@ public class Semantico {
                     buscarSimbolo(getInParentesis(nodosSintactico.getLexema())).setTipo(tipo);
                     buscarSimbolo(getInParentesis(nodosSintactico.getLexema())).setValor(valor);
                 }else{
-                     listaErrores.add("Error Semantico doble declaracion"+" "+nodosSintactico.getLexema());
+                     listaErrores.add("L "+contadorDeRenglones+" Error Semantico doble declaracion"+" "+nodosSintactico.getLexema());
                 }
                  renglon.getDecoracion().add(tipo);
                  renglon.getDecoracion().add(getInParentesis(nodosSintactico.getLexema()));
@@ -167,6 +203,17 @@ public class Semantico {
             }
         }
         return lexema.substring(izq+1, lexema.length()-1);
+    }
+    public String getPostBarraBaja(String lexema){
+        int izq=0;
+        for (int i = lexema.length()-1; i > 1 ; i--) {
+           
+            if (lexema.charAt(i)=='_') {
+                izq = i;
+                break;
+            }
+        }
+        return lexema.substring(izq+1, lexema.length());
     }
     
     public boolean esEntero(String lexema){
@@ -213,11 +260,99 @@ public class Semantico {
         return lista;
     }
     
+    public void decorarOperacion(ArrayList<Integer> listaHijos , String tipoIdope){
+        for (Integer listaHijo : listaHijos) {
+            
+            for (int i = listaHijo; i > 1; i--) {
+                if (listaHijo.intValue()==nodosSintacticos.get(i).getNumero()) { //compara si los nodos corresponden a la lista de hijos obtenida
+                    if (nodosSintacticos.get(i).getLexema().equals("IDASIG")) { //compara si se encontro un nodo hijo IDASIG
+                        int position = getPosicionHijo(nodosSintacticos.get(i).getNumero()); // se obtiene la posicion en la lista del hijo
+                        if (tieneTipo(buscarSimbolo(getInParentesis(nodosSintacticos.get(position).getLexema())))) { //se verifica que haya sido declarada la variable antes por si tiene asignado un tipo
+                            
+                            if (buscarSimbolo(getInParentesis(nodosSintacticos.get(position).getLexema())).getTipo().equals(tipoIdope)) { //compara el tipo del simbolo con el tipo de la primera variable
+                                nodosSintacticos.get(i).getDecoracion().add(tipoIdope); //decora el nodo IDASIG
+                                nodosSintacticos.get(i).getDecoracion().add(getInParentesis(nodosSintacticos.get(position).getLexema())); // agrega una segunda decoracion al nodo IDASIG
+                                
+                            }else{
+                                listaErrores.add("L "+contadorDeRenglones+" Error operacion con distintos tipos "+nodosSintacticos.get(position).getLexema()); //agrega el error a la lista de errores
+                            }
+                            
+                        }else{
+                              listaErrores.add("L "+contadorDeRenglones+" Error variable no declarada "+nodosSintacticos.get(position).getLexema()); //agrega el error a la lista de errores
+                        }
+                    }
+                    
+                    //busqueda de valor
+                    if (nodosSintacticos.get(i).getLexema().equals("VALOR")) { //busca si encontro un lexema valor
+                        int position = getPosicionHijo(nodosSintacticos.get(i).getNumero()); //obtener la posicion de la lista del hijo en este caso de un num
+                        boolean ferror = false; //bandera por si hay un error
+                        if (esEntero(getInParentesis(nodosSintacticos.get(position).getLexema())) && tipoIdope.equals("REAL")) { //compara si es un numero entero y si el tipo de la primera variable es real
+                            listaErrores.add("L "+contadorDeRenglones+" Error operacion con distintos tipos "+nodosSintacticos.get(position).getLexema()); // agrega el error a la lista
+                            ferror = true; //enciende la bandera
+                        }
+                        if (!esEntero(getInParentesis(nodosSintacticos.get(position).getLexema())) && tipoIdope.equals("INTEGER")) { //compara si es un numero real y si el tipo de la primera variable es entero
+                            listaErrores.add("L "+contadorDeRenglones+" Error operacion con distintos tipos "+nodosSintacticos.get(position).getLexema());// agrega el error a la lista
+                            ferror = true; // enciende la bandera
+                        }
+                        if (!ferror) {
+                            nodosSintacticos.get(i).getDecoracion().add(tipoIdope); //decora el nodo valor
+                            nodosSintacticos.get(i).getDecoracion().add(getInParentesis(nodosSintacticos.get(position).getLexema())); // agrega una sefuna decoracion al nodo valor
+                            
+                            nodosSintacticos.get(position).getDecoracion().add(tipoIdope); //decora el nodo tk_num
+                            nodosSintacticos.get(position).getDecoracion().add(getInParentesis(nodosSintacticos.get(position).getLexema())); // agrega una segunda decoracion al nodo tk_num
+                        }
+                    }
+                    
+                    //se encuentra un nodo operacion
+                    if (nodosSintacticos.get(i).getLexema().equals("OPERACION")) { //compara si encontro un nodo operacion
+                        decorarOperacion(buscarHijosOperacion(nodosSintacticos.get(i)), tipoIdope); // se vuelve a llamar a si misma para decorar los nodos de otra operacion
+                        nodosSintacticos.get(i).getDecoracion().add(tipoIdope); // decora el nodo con el tipo
+                    }
+                    
+                    //encuentra un tipoope
+                    if (nodosSintacticos.get(i).getLexema().equals("TIPOOPE")) {  // compara si encotro un nodo tipoope
+                        int position = getPosicionHijo(nodosSintacticos.get(i).getNumero()); //busca la posicion de tk_ADD o MUl o DIV o SUBB
+                        
+                        nodosSintacticos.get(i).getDecoracion().add(tipoIdope); //decora el nodo con el tipo de operacion
+                        nodosSintacticos.get(i).getDecoracion().add(getPostBarraBaja(nodosSintacticos.get(position).getLexema())); // decora el nodo con la operacion
+                        
+                        nodosSintacticos.get(position).getDecoracion().add(tipoIdope); // decora el nodo con el tipo de operacion
+                        nodosSintacticos.get(position).getDecoracion().add(getPostBarraBaja(nodosSintacticos.get(position).getLexema())); // decora el nodo con la operacion que se va a hacer
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    public int getPosicionHijo(int numero){
+        for (int i = 0; i < nodosSintacticos.size()-1; i++) {
+            if (nodosSintacticos.get(i).getPadre()==numero) {
+                return i;
+            }
+        }
+        return 0;
+    }
+    public ArrayList<Integer> buscarHijosOperacion(Renglon renglon){
+        ArrayList<Integer> lista = new ArrayList<>();
+        for (int i =  renglon.getNumero(); i > 0; i--) {
+            if ( nodosSintacticos.get(i).getPadre()==renglon.getNumero()) {
+                if (nodosSintacticos.get(i).getLexema().equals("PARAMETRO")) {
+                    renglon = nodosSintacticos.get(i);
+                }
+                lista.add(nodosSintacticos.get(i).getNumero());
+            }
+        }
+        return lista;
+    }
+    
     public boolean isDeclaracion(String text){
         if (text.equals("tk_INTEGER") || text.equals("tk_REAL")) {
             return true;
         }
         return false;
+    }
+    public boolean isIDOPE(String text){
+        return text.equals("IDOPE");
     }
     public boolean isInteger(String text){
         if (text.equals("tk_INTEGER")) {
