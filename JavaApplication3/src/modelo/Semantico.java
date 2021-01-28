@@ -312,7 +312,8 @@ public class Semantico {
                                 
                             }else{
                                 listaTipos.add((buscarSimbolo(getInParentesis(nodosSintacticos.get(position).getLexema()))).getTipo());
-                                //listaErrores.add("L "+contadorDeRenglones+" Error operacion con distintos tipos "+nodosSintacticos.get(position).getLexema()); //agrega el error a la lista de errores
+                               // listaErrores.add("L "+contadorDeRenglones+" Error operacion con distintos tipos "+nodosSintacticos.get(position).getLexema()); //agrega el error a la lista de errores
+                            
                             }
                             
                         }else{
@@ -366,11 +367,12 @@ public class Semantico {
         if (!listaTipos.isEmpty() && uno==1) {
             boolean tiposiguales=true;
         for (String listaTipo : listaTipos) {
-            if (!listaTipo.equals(listaTipos.get(listaTipos.size()-1))) {
+            if (!listaTipo.equals(listaTipos.get(0))) {
                 tiposiguales=false;
             }
         }
         if (!listaTipos.get(listaTipos.size()-1).equals(tipoIdope) && tiposiguales ) {
+            
             uno=0;
             listaErrores.add("L "+contadorDeRenglones+" Error Semantico operacion con distintos tipos "); //agrega el error a la lista de errores         
         }else{
@@ -379,7 +381,7 @@ public class Semantico {
             }
         }
         }
-        return 0;
+        return uno;
     }
     public int getPosicionHijo(int numero){
         for (int i = 0; i < nodosSintacticos.size()-1; i++) {
